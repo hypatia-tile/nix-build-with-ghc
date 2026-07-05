@@ -8,32 +8,74 @@
     self,
     nixpkgs,
   }: let
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ];
+    forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+    pkgsFor = system:
+      import nixpkgs {
+        inherit system;
+      };
   in {
-    packages.${system}.default = pkgs.stdenv.mkDerivation {
-      pname = "tiny-ghc-nix";
-      version = "0.1.0";
-      src = ./.;
+    packages = forAllSystems (system: let
+      # pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = pkgsFor system;
+    in {
+      #   packages.${system}.default = pkgs.stdenv.mkDerivation {
+      #     pname = "tiny-ghc-nix";
+      #     version = "0.1.0";
+      #     src = ./.;
+      #
+      #     nativeBuildInputs = [
+      #       pkgs.ghc
+      #     ];
+      #
+      #     buildPhase = ''
+      #       mkdir -p build
+      #       ghc -Wall -Werror app/Main.hs -o build/tiny-ghc-nix
+      #     '';
+      #
+      #     installPhase = ''
+      #       mkdir -p $out/bin
+      #       cp build/tiny-ghc-nix $out/bin/tiny-ghc-nix
+      #     '';
+      #   };
+      default = pkgs.stdenv.mkDerivation {
+        pname = "tiny-ghc-nix";
+        version = "0.1.0";
+        src = ./.;
 
-      nativeBuildInputs = [
-        pkgs.ghc
-      ];
+        nativeBuildInputs = [
+          pkgs.ghc
+        ];
 
-      buildPhase = ''
-        mkdir -p build
-        ghc -Wall -Werror app/Main.hs -o build/tiny-ghc-nix
-      '';
+        buildPhase = ''
+          mkdir -p build
+          ghc -Wall -Werror app/Main.hs -o build/tiny-ghc-nix
+        '';
 
-      installPhase = ''
-        mkdir -p $out/bin
-        cp build/tiny-ghc-nix $out/bin/tiny-ghc-nix
-      '';
-    };
-    devShells.${system}.default = pkgs.mkShell {
-      packages = [
-        pkgs.ghc
-      ];
-    };
+        installPhase = ''
+          mkdir -p $out/bin
+          cp build/tiny-ghc-nix $out/bin/tiny-ghc-nix
+        '';
+      };
+    });
+
+    devShells = forAllSystems (system: let
+      pkgs = pkgsFor system;
+    in {
+      #   devShells.${system}.default = pkgs.mkShell {
+      #     packages = [
+      #       pkgs.ghc
+      #     ];
+      #   };
+      default = pkgs.mkShell {
+        packages = [
+          pkgs.ghc
+        ];
+      };
+    });
   };
 }
