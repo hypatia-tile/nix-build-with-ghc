@@ -1,5 +1,7 @@
 module Main where
 
+import Tiny (greeting)
+
 main :: IO ()
 main = do
-  putStrLn "Hello from GHC built by Nix."
+  putStrLn greeting
