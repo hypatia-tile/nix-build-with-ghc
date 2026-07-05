@@ -52,8 +52,16 @@
         ];
 
         buildPhase = ''
-          mkdir -p build
-          ghc -Wall -Werror -iapp app/Main.hs -o build/tiny-ghc-nix
+          mkdir -p build/objects build/interfaces
+          ghc \
+            -Wall \
+            -Werror \
+            -isrc \
+            src/Main.hs \
+            -outputdir build/objects \
+            -odir build/objects \
+            -hidir build/interfaces \
+            -o build/tiny-ghc-nix
         '';
 
         installPhase = ''
