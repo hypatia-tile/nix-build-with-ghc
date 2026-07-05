@@ -3,4 +3,4 @@ module Tiny.Greeting
   ) where
 
 greeting :: String
-greeting = "Hello from Tiny.Greeting."
+greeting = "Hello from ansi-terminal supported by Nix."
