@@ -3,8 +3,8 @@ module Tiny.Math
   , square
   ) where
 
-double :: Int -> Int
+double :: Integer -> Integer
 double n = n * 2
 
-square :: Int -> Int
+square :: Integer -> Integer
 square n = n * n
