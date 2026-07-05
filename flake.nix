@@ -22,33 +22,38 @@
     packages = forAllSystems (system: let
       pkgs = pkgsFor system;
     in {
-      default = pkgs.stdenv.mkDerivation {
-        pname = "tiny-ghc-nix";
-        version = "0.1.0";
-        src = ./.;
+      default = let
+        ghcWithDeps = pkgs.haskellPackages.ghcWithPackages (hpkgs: [
+          hpkgs.ansi-terminal
+        ]);
+      in
+        pkgs.stdenv.mkDerivation {
+          pname = "tiny-ghc-nix";
+          version = "0.1.0";
+          src = ./.;
 
-        nativeBuildInputs = [
-          pkgs.ghc
-        ];
+          nativeBuildInputs = [
+            ghcWithDeps
+          ];
 
-        buildPhase = ''
-          mkdir -p build/objects build/interfaces
-          ghc \
-            -Wall \
-            -Werror \
-            -isrc \
-            src/Main.hs \
-            -outputdir build/objects \
-            -odir build/objects \
-            -hidir build/interfaces \
-            -o build/tiny-ghc-nix
-        '';
+          buildPhase = ''
+            mkdir -p build/objects build/interfaces
+            ghc \
+              -Wall \
+              -Werror \
+              -isrc \
+              src/Main.hs \
+              -outputdir build/objects \
+              -odir build/objects \
+              -hidir build/interfaces \
+              -o build/tiny-ghc-nix
+          '';
 
-        installPhase = ''
-          mkdir -p $out/bin
-          cp build/tiny-ghc-nix $out/bin/tiny-ghc-nix
-        '';
-      };
+          installPhase = ''
+            mkdir -p $out/bin
+            cp build/tiny-ghc-nix $out/bin/tiny-ghc-nix
+          '';
+        };
     });
 
     devShells = forAllSystems (system: let
