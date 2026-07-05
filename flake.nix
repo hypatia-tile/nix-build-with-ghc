@@ -53,7 +53,7 @@
 
         buildPhase = ''
           mkdir -p build
-          ghc -Wall -Werror app/Main.hs -o build/tiny-ghc-nix
+          ghc -Wall -Werror -iapp app/Main.hs -o build/tiny-ghc-nix
         '';
 
         installPhase = ''
